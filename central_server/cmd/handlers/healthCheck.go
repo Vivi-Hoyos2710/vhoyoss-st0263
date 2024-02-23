@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/Vivi-Hoyos2710/vhoyoss-st0263/central_server/pkg/web/web"
+	"github.com/Vivi-Hoyos2710/vhoyoss-st0263/central_server/pkg/web"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
