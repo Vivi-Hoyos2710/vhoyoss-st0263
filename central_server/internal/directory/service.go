@@ -6,20 +6,20 @@ type ServiceDirectory interface {
 }
 
 type ServiceDefaultDir struct {
-	repository Repository
+	repository DirRepository
 }
 
-func NewServiceClient(repo Repository) *ServiceClient {
-	return &ServiceClient{repository: repo}
+func NewServiceClient(repo DirRepository) *ServiceDefaultDir {
+	return &ServiceDefaultDir{repository: repo}
 
 }
 
-func (s ServiceClient) Query() error {
+func (s ServiceDefaultDir) Query() error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s ServiceClient) SendIndex() error {
+func (s ServiceDefaultDir) SendIndex() error {
 	//TODO implement me
 	panic("implement me")
 }
