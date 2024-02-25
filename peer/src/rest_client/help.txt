@@ -1,0 +1,3 @@
+sendIndex: Insert url, sendIndex_data
+query: 
+quit: Exit the CLI.

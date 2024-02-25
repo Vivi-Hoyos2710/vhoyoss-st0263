@@ -2,39 +2,48 @@ package directory
 
 import (
 	"errors"
-	"fmt"
 )
 
 var (
-	ErrExists = errors.New("directory: index already exists")
+	ErrExists   = errors.New("directory: index file already exists")
+	ErrNotFound = errors.New("directory: index file not found")
 )
 
 type DirRepository interface {
-	SaveIndex(index string) error
-	GetIndexTable() (map[int]string, error)
-	SearchFile(filename string) error
+	SaveIndex(index Index) error
+	GetIndexTable() map[string]string
+	SearchFile(filename string) (string, error)
 }
 type defaultMapRepo struct {
 	indexTable *map[string]string
 }
 
-func (d defaultMapRepo) SaveIndex(index string) error {
+func NewDefaultRepo(newIndexTable *map[string]string) DirRepository {
+	return defaultMapRepo{indexTable: newIndexTable}
+}
+func (d defaultMapRepo) SaveIndex(index Index) error {
 	table := *d.indexTable
-
-	for key, indexTable := range table {
-		if indexTable == index {
-			return fmt.Errorf("%w id:%s", ErrExists, key)
+	for _, file := range index.Files {
+		if _, ok := table[file]; ok {
+			return ErrExists
 		}
+	}
+	for _, file := range index.Files {
+		table[file] = index.Username
 	}
 	return nil
 }
 
-func (d defaultMapRepo) GetIndexTable() (map[int]string, error) {
-	//TODO implement me
-	panic("implement me")
+func (d defaultMapRepo) GetIndexTable() map[string]string {
+	table := *d.indexTable
+	return table
 }
 
-func (d defaultMapRepo) SearchFile(filename string) error {
-	//TODO implement me
-	panic("implement me")
+func (d defaultMapRepo) SearchFile(filename string) (string, error) {
+	table := *d.indexTable
+	if _, ok := table[filename]; ok {
+		user := table[filename]
+		return user, nil
+	}
+	return "", ErrNotFound
 }

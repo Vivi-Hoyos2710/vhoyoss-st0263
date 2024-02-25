@@ -17,6 +17,7 @@
 # 2. información general de diseño de alto nivel, arquitectura, patrones, mejores prácticas utilizadas.
 
 # 3. Descripción del ambiente de desarrollo y técnico: lenguaje de programación, librerias, paquetes, etc, con sus numeros de versiones.
+Server Central desarrollado con Golang, Endpoints:
 
 ## como se compila y ejecuta.
 ## detalles del desarrollo.

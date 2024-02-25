@@ -2,7 +2,10 @@ module github.com/Vivi-Hoyos2710/vhoyoss-st0263/central_server
 
 go 1.21.4
 
-require github.com/gin-gonic/gin v1.9.1
+require (
+	github.com/gin-gonic/gin v1.9.1
+	github.com/joho/godotenv v1.5.1
+)
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect

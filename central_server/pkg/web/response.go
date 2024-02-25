@@ -3,15 +3,17 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 type ResponseJSON struct {
-	Code  string      `json:"code"`
-	Data  interface{} `json:"data,omitempty"`
-	Token interface{} `json:"token,omitempty"`
+	Code         string      `json:"code"`
+	Message      interface{} `json:"message,omitempty"`
+	Token        interface{} `json:"token,omitempty"`
+	LocationPath interface{} `json:"location,omitempty"`
 }
 
 type ErrorResponse struct {
@@ -26,11 +28,14 @@ func Response(c *gin.Context, status int, data interface{}) {
 
 func Success(c *gin.Context, status int, data interface{}) {
 	Response(c, status, ResponseJSON{
-		Code: http.StatusText(status),
-		Data: data})
+		Code:    strconv.Itoa(status),
+		Message: data})
 }
 func SuccessLogin(c *gin.Context, status int, data interface{}) {
-	Response(c, status, ResponseJSON{Token: data})
+	Response(c, status, ResponseJSON{Code: http.StatusText(status), Token: data})
+}
+func SuccessQuery(c *gin.Context, status int, data interface{}) {
+	Response(c, status, ResponseJSON{Code: http.StatusText(status), LocationPath: data})
 }
 
 func Error(c *gin.Context, status int, format string, args ...interface{}) {
