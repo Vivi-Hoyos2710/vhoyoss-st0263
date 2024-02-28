@@ -1,7 +1,7 @@
 from concurrent import futures
 import grpc
 from src.protobuf_files.filesystem_pb2_grpc import add_FileSystemServicer_to_server
-from server.grpc_services.file_system import FileSystemService
+from src.server.grpc_services.file_system import FileSystemService
 class Server:
     def __init__(self, host: str,port: str) -> None:
         self.host = host
