@@ -1,12 +1,12 @@
 import grpc
 import time
-from google.protobuf import empty_pb2
-from protobuf.filesystem_pb2_grpc import FileSystemStub
-from protobuf.filesystem_pb2 import Filename
-class Client:
+from protobuf_files.filesystem_pb2_grpc import FileSystemStub
+from protobuf_files.filesystem_pb2 import Filename
+class Client_Remote:
     def _create_client(self,socket: str):
          channel: grpc.Channel = grpc.insecure_channel(socket)
-         return FileSystemStub(channel)
+         stub: FileSystemStub= FileSystemStub(channel)
+         return stub
         
     def upload(self, socket: str) -> None:
         print(f"Intentando crear cliente con SOCKET={socket}", flush=True)

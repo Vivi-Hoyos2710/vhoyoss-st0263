@@ -3,14 +3,13 @@ import cmd
 import requests
 from dotenv import load_dotenv
 import sys
+import json
 
 
 # Load environment variables from .env file
 load_dotenv()
 
 class APIClient(cmd.Cmd):
-    prompt = 'CLI>>'
-    intro = 'Welcome to the Direectory and Localization CLI. Type "help" for available commands.'
 
     def __init__(self):
         self.ipl = os.getenv("IP_Listening")
@@ -19,16 +18,12 @@ class APIClient(cmd.Cmd):
         self.url_servidor = os.getenv("URL_SERVIDOR_CENTRAL")
         self.help_messages = self.load_help_messages()
 
+
     def load_help_messages(self):
-        help_messages = {}
         with open('help.txt', 'r') as file:
             content = file.read()
-            print(content)
-            #for line in file:
-            #    command, message = line.strip().split(': ')
-            #    help_messages[command] = message
-        #return help_messages
-
+            return content
+            
     def logIn(self, url, LogIn_data):
         specurl = url + "api/v1/login"
         try:
@@ -84,22 +79,7 @@ class APIClient(cmd.Cmd):
         except requests.exceptions.RequestException as e:
             print(f"Error making request: {e}")
             return None
-        
-
-
-
-
-
-
-    def do_help(self, line):
-        if line:
-            command = line.strip()
-            if command in self.help_messages:
-                print(self.help_messages[command])
-            else:
-                print(f"Help message for '{command}' not found.")
-        else:
-            super().do_help(line)
+    
 
     def do_quit(self, line):
         return True
@@ -111,31 +91,34 @@ class APIClient(cmd.Cmd):
 if __name__ == "__main__":
 
     # APIClient().cmdloop()
-
+    if len(sys.argv) != 4:
+        print("Please run the client using the following format:")
+        print("python pclient.py <Username> <Password> <User url>")
+        sys.exit()
     username = sys.argv[1]
     password = sys.argv[2]
     user_url = sys.argv[3]
-    #for arg in sys.argv:
+    
     LogIn_data = {"username": username,"password": password,"user_url": user_url}
     
     client = APIClient()
     login_response = client.logIn(client.url_servidor, LogIn_data)
-    authToken = login_response['token']
-    print(username)
+    print("Logged in successfully!!")
     print(login_response)
-    
-    # indexdata = {"username": sys.argv[1],"files":['HarryPotter.txt']}
-    # sendIndex_response = client.do_sendIndex(client.url_servidor, indexdata, authToken)
-    # print(sendIndex_response)
+    authToken = login_response['token']
 
-    # querydata = {"filename":'HarryPotter.txt'}
-    # query_response = client.do_query(client.url_servidor, querydata, authToken)
-    # print(query_response)
+    helpmes = client.load_help_messages()
+    print(helpmes)
+    
+    
+    indexdata = {"username": sys.argv[1],"files":['HarryPotter1234.txt']}
+    sendIndex_response = client.do_sendIndex(client.url_servidor, indexdata, authToken)
+    print(sendIndex_response)
+
+    querydata = {"filename":'HarryPotter.txt'}
+    query_response = client.do_query(client.url_servidor, querydata, authToken)
+    print(query_response)
 
     logoutdata = {"username": username}
     logout_response = client.logOut(client.url_servidor, logoutdata, authToken)
     print(logout_response)
-
-
-
-    
