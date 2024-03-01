@@ -1,11 +1,29 @@
 
 from src.protobuf_files.filesystem_pb2 import Response
-from  src.protobuf_files.filesystem_pb2_grpc import FileSystem
+from src.protobuf_files.filesystem_pb2_grpc import FileSystemServicer, FileSystem
+from grpc import StatusCode
 
-class FileSystemService(FileSystem):
+class FileSystemService(FileSystemServicer):
    def Upload(self, request, context):
-      print("Initializing uploading of file: " + str(request.filename)+ "to peer")
-      return Response("uploaded file "+str(request.filename))
+      try:
+          if request.name == "":
+              print("Error, empty file")
+              raise Exception("Empty file")
+          response = Response(message=f"File '{request.name}' uploaded succesfully (ID: {request.id})")
+          return response
+      except Exception as e:
+          context.set_details(str(e))
+          context.set_code(StatusCode.INVALID_ARGUMENT)
+          return Response()
+     
    def Download(self, request, context):
-      print("Initializing downloadinf of file: " + str(request.filename)+ "to peer")
-      return Response("uploaded file "+str(request.filename))
+      try:
+         if request.name == "":
+               print("Error, empty file")
+               raise Exception("Empty file")
+         response = Response(message=f"File '{request.name}' downloaded succesfully (ID: {request.id})")
+         return response
+      except Exception as e:
+          context.set_details(str(e))
+          context.set_code(StatusCode.INVALID_ARGUMENT)
+          return Response()

@@ -10,7 +10,7 @@ class Client_Remote:
     def upload(self, socket: str) -> None:
         print(f"Intentando crear cliente con SOCKET={socket}", flush=True)
         client=self._create_client(socket)
-        req=  Filename("test.txt")
+        req=  Filename(id=1,name="hola.txt")
         response= client.Upload(req)
         print(response)
 
