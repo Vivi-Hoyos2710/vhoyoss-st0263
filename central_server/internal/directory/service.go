@@ -11,9 +11,9 @@ var (
 )
 
 type ServiceDirectory interface {
-	Query(filename string) (string, error)
+	Query(filename string) ([]string, error)
 	SendIndex(indexInfo Index) error
-	GetIndexTable() map[string]string
+	GetIndexTable() map[string][]string
 }
 
 type ServiceDefaultDir struct {
@@ -26,7 +26,7 @@ func NewServiceClient(repo DirRepository) *ServiceDefaultDir {
 }
 
 // Query searches for a file in the index table
-func (s ServiceDefaultDir) Query(filename string) (string, error) {
+func (s ServiceDefaultDir) Query(filename string) ([]string, error) {
 	return s.repository.SearchFile(filename)
 }
 
@@ -47,14 +47,14 @@ func (s ServiceDefaultDir) SendIndex(indexInfo Index) error {
 }
 
 // GetIndexTable returns the index table
-func (s ServiceDefaultDir) GetIndexTable() map[string]string {
+func (s ServiceDefaultDir) GetIndexTable() map[string] []string {
 	return s.repository.GetIndexTable()
 
 }
 
 // validateFileExtension validates that the file extension is allowed and correct
 func validateFileExtension(filename string) error {
-	allowedExtensions := []string{"jpg", "png", "doc", "docx", "html", "txt"}
+	allowedExtensions := []string{"jpg", "png", "doc", "docx", "html", "txt","pdf"}
 	pattern := `(\w+)\.(` + strings.Join(allowedExtensions, "|") + `)$`
 	re, err := regexp.Compile(pattern)
 	if err != nil {

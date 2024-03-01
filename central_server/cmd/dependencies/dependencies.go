@@ -29,10 +29,9 @@ func SetDependencies(db *sql.DB) *handlers.ApiRest {
 	default:
 		fmt.Println("default dependencies...creating peersMap & indexTable as map structure")
 		peersMap := make(map[string]auth.Peer)
-		indexTable := make(map[string]string)
+		indexTable := make(map[string][]string)
 		repoAuth = auth.NewDefaultRepo(peersMap)
 		repoDir = directory.NewDefaultRepo(&indexTable)
-
 	}
 	authService := auth.NewServiceClient(repoAuth)
 	directoryService := directory.NewServiceClient(repoDir)

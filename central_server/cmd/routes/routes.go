@@ -43,4 +43,5 @@ func (r *router) buildAuthRoutes() {
 	r.routerGroup.POST("/sendIndex", handler.SendIndex)
 	r.routerGroup.GET("/indexTable", handler.GetIndexTable)
 	r.routerGroup.GET("/query", handler.Query)
+	r.routerGroup.GET("/getPeerUploading", handler.AssignPeerUploading)
 }

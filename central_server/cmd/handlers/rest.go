@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/Vivi-Hoyos2710/vhoyoss-st0263/central_server/internal/auth"
@@ -47,11 +46,8 @@ func (a *ApiRest) Login(c *gin.Context) {
 		web.Error(c, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	loggedPeer, err := a.authService.Login(peer)
-	if err != nil {
-		handleErrors(c, err)
-		return
-	}
+	loggedPeer, _ := a.authService.Login(peer)
+	
 	web.SuccessLogin(c, http.StatusOK, loggedPeer)
 
 }
@@ -69,15 +65,19 @@ func (a *ApiRest) Logout(c *gin.Context) {
 	web.Success(c, http.StatusOK, "logged out successfully")
 
 }
+//Query Call to the directory service to get the location of the file, for fucntion DownloadFile
 func (a *ApiRest) Query(c *gin.Context) {
 	filename := c.Query("file")
-	fmt.Println(filename)
-	userName, err := a.directoryService.Query(filename)
+	if filename == "" {
+		web.Error(c, http.StatusBadRequest, "invalid request param")
+		return
+	}
+	userNames, err := a.directoryService.Query(filename)
 	if err != nil {
 		handleErrors(c, err)
 		return
 	}
-	user, err := a.authService.GetUser(userName)
+	user, err := a.authService.SelectRandomPeer(userNames)
 	if err != nil {
 		handleErrors(c, err)
 		return
@@ -87,10 +87,23 @@ func (a *ApiRest) Query(c *gin.Context) {
 	web.SuccessQuery(c, http.StatusOK, locationPath)
 
 }
+func (a *ApiRest) AssignPeerUploading(c *gin.Context) {
+	uploadingFile := c.Query("filename")
+	if uploadingFile == "" {
+		web.Error(c, http.StatusBadRequest, "invalid request param")
+		return
+	}
+	username:= c.Query("user")
+	location, err := a.authService.AssignPeer(username,uploadingFile)
+	if err != nil {
+		handleErrors(c, err)
+		return
+	}
+	web.Success(c, http.StatusOK, location)
+
+}
 func handleErrors(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, directory.ErrExists):
-		web.Error(c, http.StatusConflict, err.Error())
 	case errors.Is(err, directory.ErrNotFound):
 		web.Error(c, http.StatusNotFound, err.Error())
 	case errors.Is(err, auth.ErrNotFound):
@@ -99,6 +112,8 @@ func handleErrors(c *gin.Context, err error) {
 		web.Error(c, http.StatusBadRequest, err.Error())
 	case errors.Is(err, auth.ErrExists):
 		web.Error(c, http.StatusConflict, err.Error())
+	case errors.Is(err, auth.ErrNoPeersAvailable):
+		web.Error(c, http.StatusNotFound, err.Error())
 	default:
 		web.Error(c, http.StatusInternalServerError, err.Error())
 

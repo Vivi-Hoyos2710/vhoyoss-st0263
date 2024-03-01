@@ -4,7 +4,7 @@ run:
 	@go docker-compose up
 
 proto:
-	@python3 -m grpc_tools.protoc -I ./protobuf --python_out=./peer/src/protobuf --pyi_out=./peer/src/protobuf --grpc_python_out=./peer/src/protobuf ./protobuf/filesystem.proto
+	@python3 -m grpc_tools.protoc -I ./protobuf --python_out=./peer/src/protobuf_files --pyi_out=./peer/src/protobuf_files --grpc_python_out=./peer/src/protobuf_files ./protobuf/filesystem.proto
 
 install:
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
