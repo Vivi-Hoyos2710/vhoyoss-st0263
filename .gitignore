@@ -2,3 +2,4 @@
 # IDE specific files
 .idea/
 .vscode/
+*.pyc
