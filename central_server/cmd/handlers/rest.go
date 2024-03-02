@@ -118,7 +118,7 @@ func (a *ApiRest) AssignPeerUploading(c *gin.Context) {
 		handleErrors(c, err)
 		return
 	}
-	web.Success(c, http.StatusOK, location)
+	web.SuccessQuery(c, http.StatusOK, location)
 
 }
 func handleErrors(c *gin.Context, err error) {

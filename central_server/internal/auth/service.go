@@ -103,14 +103,17 @@ func (s *ServiceClient) AssignPeer(excludedPeerr Peer) (location string, err err
 	peer, _ := s.repository.GetPeer(candidatePeerUsername)
 
 	s.peerCount++
-	fmt.Println("Peer: ", excludedPeerr, "Candidate: ", peer, "into the socket: ", peer.UserURL)
+	fmt.Println("Peer: ", excludedPeerr.Username, "Candidate: ", peer.Username, "into the socket: ", peer.UserURL)
 	location = peer.UserURL
 	err = nil
 	return
 
 }
 func (s *ServiceClient) SelectRandomPeer(users []string, excludedUser Peer) (Peer, error) {
-	if len(users) == 0 {
+	if len(users) ==0 {
+		return Peer{}, ErrNoPeersAvailable
+	}
+	if len(users) == 1 && users[0] == excludedUser.Username{
 		return Peer{}, ErrNoPeersAvailable
 	}
 	// Loop until it finds a random user that is not the excluded user
