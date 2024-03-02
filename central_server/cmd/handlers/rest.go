@@ -11,13 +11,13 @@ import (
 )
 
 type ApiRest struct {
-	authService      auth.Service
+	AuthService      auth.Service
 	directoryService directory.ServiceDirectory
 }
 
 func NewApiRest(auth auth.Service, dir directory.ServiceDirectory) *ApiRest {
 	return &ApiRest{
-		authService:      auth,
+		AuthService:      auth,
 		directoryService: dir,
 	}
 }
@@ -31,6 +31,13 @@ func (a *ApiRest) SendIndex(c *gin.Context) {
 		web.Error(c, http.StatusBadRequest, "invalid request body")
 		return
 	}
+	peer,ok:= c.Get("peer")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Peer information not found"})
+		return
+	}
+	peerString:=peer.(auth.Peer).Username
+	indexInfo.Username=peerString
 	err := a.directoryService.SendIndex(indexInfo)
 	if err != nil {
 		handleErrors(c, err)
@@ -39,25 +46,30 @@ func (a *ApiRest) SendIndex(c *gin.Context) {
 	web.Success(c, http.StatusOK, "index sent successfully")
 
 }
-
+//Login Call to the auth service to get the token, for fucntion Login
 func (a *ApiRest) Login(c *gin.Context) {
 	var peer auth.Peer
 	if err := c.ShouldBindJSON(&peer); err != nil {
 		web.Error(c, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	loggedPeer, _ := a.authService.Login(peer)
+	loggedPeer, err:= a.AuthService.Login(peer)
+	if err != nil {
+		handleErrors(c, err)
+		return
+	}
 	
 	web.SuccessLogin(c, http.StatusOK, loggedPeer)
 
 }
 func (a *ApiRest) Logout(c *gin.Context) {
-	var peer auth.PeerLogOut
-	if err := c.ShouldBindJSON(&peer); err != nil {
-		web.Error(c, http.StatusBadRequest, "invalid request body")
+	peer,ok:= c.Get("peer")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Peer information not found"})
 		return
 	}
-	err := a.authService.Logout(peer)
+	authUser:=peer.(auth.Peer)
+	err := a.AuthService.Logout(authUser)
 	if err != nil {
 		handleErrors(c, err)
 		return
@@ -72,12 +84,18 @@ func (a *ApiRest) Query(c *gin.Context) {
 		web.Error(c, http.StatusBadRequest, "invalid request param")
 		return
 	}
-	userNames, err := a.directoryService.Query(filename)
+	peer,ok:= c.Get("peer")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Peer information not found"})
+		return
+	}
+	excludedPeerr:=peer.(auth.Peer)
+	peerUserNames, err := a.directoryService.Query(filename)
 	if err != nil {
 		handleErrors(c, err)
 		return
 	}
-	user, err := a.authService.SelectRandomPeer(userNames)
+	user, err := a.AuthService.SelectRandomPeer(peerUserNames,excludedPeerr)
 	if err != nil {
 		handleErrors(c, err)
 		return
@@ -88,13 +106,14 @@ func (a *ApiRest) Query(c *gin.Context) {
 
 }
 func (a *ApiRest) AssignPeerUploading(c *gin.Context) {
-	uploadingFile := c.Query("filename")
-	if uploadingFile == "" {
-		web.Error(c, http.StatusBadRequest, "invalid request param")
+	
+	peer,ok:= c.Get("peer")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Peer information not found"})
 		return
 	}
-	username:= c.Query("user")
-	location, err := a.authService.AssignPeer(username,uploadingFile)
+	excludedPeerr:=peer.(auth.Peer)
+	location, err := a.AuthService.AssignPeer(excludedPeerr)
 	if err != nil {
 		handleErrors(c, err)
 		return
@@ -110,10 +129,11 @@ func handleErrors(c *gin.Context, err error) {
 		web.Error(c, http.StatusNotFound, err.Error())
 	case errors.Is(err, directory.ErrInvalidFormat):
 		web.Error(c, http.StatusBadRequest, err.Error())
-	case errors.Is(err, auth.ErrExists):
-		web.Error(c, http.StatusConflict, err.Error())
 	case errors.Is(err, auth.ErrNoPeersAvailable):
 		web.Error(c, http.StatusNotFound, err.Error())
+	case errors.Is(err, auth.ErrInvalidPassword):
+		web.Error(c, http.StatusUnauthorized, err.Error())
+	
 	default:
 		web.Error(c, http.StatusInternalServerError, err.Error())
 

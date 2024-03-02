@@ -9,6 +9,12 @@ def query_procedure():
     file2search = input()
     querydata = {"filename": file2search}
     return querydata
+
+def upload_procedure(username):
+    print("Please write the name of the file you are currently searching for:")
+    file2search = input()
+    querydata = {"filename": file2search, "username":username}
+    return querydata
     
 
 if __name__ == "__main__":
@@ -43,7 +49,20 @@ if __name__ == "__main__":
             query_response = client.do_query(client.url_servidor, querydata, authToken)
             print(query_response)
 
-        elif action == "2":
+        
+        if action == "2":
+            querydata = query_procedure()
+            query_response = client.do_download(client.url_servidor, querydata, authToken)
+            print(query_response)
+
+    
+        if action == "3":
+            querydata = upload_procedure(username)
+            query_response = client.do_upload(client.url_servidor, querydata, authToken)
+            print(query_response)
+        
+
+        elif action == "4":
             logoutdata = {"username": username}
             logout_response = client.logOut(client.url_servidor, logoutdata, authToken)
             print(logout_response)

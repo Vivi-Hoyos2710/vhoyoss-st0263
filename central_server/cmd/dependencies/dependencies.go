@@ -20,7 +20,7 @@ func InitialConfig() (Config, error) {
 		Port: os.Getenv("PORT"),
 	}, nil
 }
-func SetDependencies(db *sql.DB) *handlers.ApiRest {
+func SetDependencies(db *sql.DB) (*handlers.ApiRest,*auth.ServiceClient) {
 	var repoAuth auth.RepositoryAuth
 	var repoDir directory.DirRepository
 	switch {
@@ -37,6 +37,6 @@ func SetDependencies(db *sql.DB) *handlers.ApiRest {
 	directoryService := directory.NewServiceClient(repoDir)
 	handler := handlers.NewApiRest(authService, directoryService)
 	fmt.Println("settings done...")
-	return handler
+	return handler,authService
 
 }

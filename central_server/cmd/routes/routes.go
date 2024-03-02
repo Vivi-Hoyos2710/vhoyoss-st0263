@@ -5,6 +5,7 @@ import (
 
 	"github.com/Vivi-Hoyos2710/vhoyoss-st0263/central_server/cmd/dependencies"
 	"github.com/Vivi-Hoyos2710/vhoyoss-st0263/central_server/cmd/handlers"
+	"github.com/Vivi-Hoyos2710/vhoyoss-st0263/central_server/cmd/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,9 +38,10 @@ func (r *router) buildHealthCheckRoutes() {
 }
 func (r *router) buildAuthRoutes() {
 	var db *sql.DB
-	handler := dependencies.SetDependencies(db)
+	handler,authService := dependencies.SetDependencies(db)
 	r.routerGroup.POST("/login", handler.Login)
-	r.routerGroup.POST("logout", handler.Logout)
+	r.routerGroup.Use(middlewares.CustomMiddleware(authService))
+	r.routerGroup.POST("/logout", handler.Logout)
 	r.routerGroup.POST("/sendIndex", handler.SendIndex)
 	r.routerGroup.GET("/indexTable", handler.GetIndexTable)
 	r.routerGroup.GET("/query", handler.Query)

@@ -2,16 +2,18 @@ package auth
 
 import (
 	"errors"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
-	ErrExists   = errors.New("user is already logged")
 	ErrNotFound = errors.New("user not found")
+	ErrInvalidPassword = errors.New("invalid password")
 )
 
 // RepositoryAuth is a repository Interface
 type RepositoryAuth interface {
-	SavePeer(user Peer) (string, error)
+	SavePeer(user Peer) (error)
 	GetAll() (*map[string]Peer, error)
 	UpdatePeer(user Peer) error
 	GetPeer(username string) (Peer, error)
@@ -27,16 +29,11 @@ func NewDefaultRepo(newPeerRegisterTable map[string]Peer) RepositoryAuth {
 		peerRegisterTable: &newPeerRegisterTable	}
 }
 
-func (d *defaultMapRepo) SavePeer(user Peer) (string, error) {
+func (d *defaultMapRepo) SavePeer(user Peer) (error) {
 	table := *d.peerRegisterTable
-	currentUser, err := d.GetPeer(user.Username)
-	if err == nil && currentUser.State == "up" {
-		return "dummyToken123", ErrExists
-	}
-	user.State = "up"
 	table[user.Username] = user
-	token := "dummyToken123"
-	return token, nil
+	
+	return nil
 
 }
 
@@ -72,4 +69,16 @@ func (d *defaultMapRepo) PeerOrderList (excludedPeerr Peer)([]string){
 		
 	}
 	return orderList
+}
+func encryptPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	return string(hash), nil
+}
+func passwordIsValid(hashedPassword, enteredPassword string) bool {
+	err:= bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(enteredPassword))
+	return err == nil
 }

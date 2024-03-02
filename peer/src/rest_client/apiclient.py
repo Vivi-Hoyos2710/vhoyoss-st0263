@@ -4,6 +4,7 @@ import requests
 from dotenv import load_dotenv
 import sys
 import os
+import json
 
 # Get the current directory of the script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -24,8 +25,9 @@ load_dotenv()
 class APIClient(cmd.Cmd):
 
     def __init__(self):
-        self.ipl = os.getenv("IP_Listening")
+        self.ipl = os.getenv("IP_Talking")
         self.port = os.getenv("PORT")
+        self.port2 = os.getenv("PORT_2")
         self.dir = os.getenv("DIR")
         self.url_servidor = os.getenv("URL_SERVIDOR_CENTRAL")
 
@@ -37,14 +39,51 @@ class APIClient(cmd.Cmd):
         try:
             query_response = requests.get(specurl, headers=headers)
             query_response.raise_for_status()
-            print(query_response)
-            client_grpc = Client_Remote()
-            client_grpc.download("localhost:50051", querydata['filename'])
+            print("query:",query_response)
+            #client_grpc = Client_Remote()
+            #client_grpc.download(f"{self.ipl}:{self.port2}", querydata['filename'])
             return query_response.json()
         
         
         except requests.exceptions.RequestException as e:
             print(f"Error making request: {e}")
+            return None
+        
+    def do_download(self, url, querydata, authToken):
+        specurl = url + "api/v1/query?file=" + querydata['filename']
+        headers = {
+            "authToken": authToken
+        }
+        try:
+            query_response = requests.get(specurl, headers=headers)
+            query_response.raise_for_status()
+            #print(query_response)
+            client_grpc = Client_Remote()
+            dresponse = client_grpc.download(f"{self.ipl}:{self.port2}", querydata['filename'])
+            return dresponse
+        
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error making request: {e}")
+            return None
+        
+    def do_upload(self, url, querydata, authToken):
+        specurl = url + "api/v1/getPeerUploading?filename=" + querydata['filename'] + "&user=" + querydata['username']
+        headers = {
+            "authToken": authToken
+        }
+        try:
+            query_response = requests.get(specurl, headers=headers)
+            query_response.raise_for_status()
+            print("query:",query_response)
+            client_grpc = Client_Remote()
+            client_grpc.upload(f"{self.ipl}:{self.port2}", querydata['filename'])
+            return query_response.json()
+        
+        
+        except requests.exceptions.RequestException as e:
+            jsonstring = json.loads(query_response.text)
+            print(f"Error making request: {jsonstring['message']}")
             return None
 
     def logOut(self, url, logout_data, authToken):

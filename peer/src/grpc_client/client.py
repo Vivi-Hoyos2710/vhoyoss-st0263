@@ -7,12 +7,12 @@ class Client_Remote:
          channel: grpc.Channel = grpc.insecure_channel(socket)
          return  FileSystemStub(channel)
         
-    def upload(self, socket: str) -> None:
+    def upload(self, socket, filenamestr) -> None:
         print(f"Intentando crear cliente con SOCKET={socket}", flush=True)
         client=self._create_client(socket)
-        req=  Filename(id=1,name="hola.txt")
+        req=  Filename(id=1,name=filenamestr)
         response= client.Upload(req)
-        print(response)
+        return response
 
     
     def download(self, socket, filenamestr) -> None:
@@ -22,6 +22,6 @@ class Client_Remote:
         req =  Filename(id=1,name=filenamestr)
         print(req)
         response = client.Download(req)
-        print(response)    
+        return response    
     
         
