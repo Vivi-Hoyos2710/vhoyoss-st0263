@@ -7,18 +7,18 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("user not found")
+	ErrNotFound        = errors.New("user not found")
 	ErrInvalidPassword = errors.New("invalid password")
 )
 
 // RepositoryAuth is a repository Interface
 type RepositoryAuth interface {
-	SavePeer(user Peer) (error)
+	SavePeer(user Peer) error
 	GetAll() (*map[string]Peer, error)
 	UpdatePeer(user Peer) error
 	GetPeer(username string) (Peer, error)
-	PeerOrderList (excludedPeerr Peer)([]string)
-
+	AllAvailablePeers(excludedPeerr string) []string
+	QueryAvailableList(excludedPeerr string, list []string) []string
 }
 type defaultMapRepo struct {
 	peerRegisterTable *map[string]Peer
@@ -26,13 +26,13 @@ type defaultMapRepo struct {
 
 func NewDefaultRepo(newPeerRegisterTable map[string]Peer) RepositoryAuth {
 	return &defaultMapRepo{
-		peerRegisterTable: &newPeerRegisterTable	}
+		peerRegisterTable: &newPeerRegisterTable}
 }
 
-func (d *defaultMapRepo) SavePeer(user Peer) (error) {
+func (d *defaultMapRepo) SavePeer(user Peer) error {
 	table := *d.peerRegisterTable
 	table[user.Username] = user
-	
+
 	return nil
 
 }
@@ -60,15 +60,29 @@ func (d *defaultMapRepo) GetPeer(username string) (Peer, error) {
 	}
 	return Peer{}, ErrNotFound
 }
-func (d *defaultMapRepo) PeerOrderList (excludedPeerr Peer)([]string){
-	orderList:= make([]string,0)
+func (d *defaultMapRepo) AllAvailablePeers(excludedPeerr string) []string {
+	orderList := make([]string, 0)
 	for _, v := range *d.peerRegisterTable {
-		if v.State == "up" && v.Username != excludedPeerr.Username{
-			orderList = append(orderList,v.Username)
+		if v.State == "up" && v.Username != excludedPeerr {
+			orderList = append(orderList, v.Username)
 		}
-		
+
 	}
 	return orderList
+}
+func (d *defaultMapRepo) QueryAvailableList(exludedPeerUser string, list []string) []string {
+	availableList := make([]string, 0)
+
+	for _, v := range list {
+		if v != exludedPeerUser {
+			peer, err := d.GetPeer(v)
+			if err == nil && peer.State == "up" {
+				availableList = append(availableList, v)
+			}
+		}
+	}
+
+	return availableList
 }
 func encryptPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -79,6 +93,6 @@ func encryptPassword(password string) (string, error) {
 	return string(hash), nil
 }
 func passwordIsValid(hashedPassword, enteredPassword string) bool {
-	err:= bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(enteredPassword))
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(enteredPassword))
 	return err == nil
 }

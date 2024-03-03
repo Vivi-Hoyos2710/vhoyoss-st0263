@@ -14,12 +14,7 @@ class Server:
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         #add service to server
         add_FileSystemServicer_to_server(FileSystemService(), self.server)
-        add_CurrencyConverterServicer_to_server(CurrencyConverterService(), self.server) ## Primero que añado!! <- <- <- <-
-
-        
-        ### ------------------------------------------------------
-        #### Debo añadir los nuevos servicios al servidor acá!!! |
-        ### ------------------------------------------------------
+        add_CurrencyConverterServicer_to_server(CurrencyConverterService(), self.server)
 
         self.server.add_insecure_port(f"{self.host}:{self.port}")
         self.server.start()

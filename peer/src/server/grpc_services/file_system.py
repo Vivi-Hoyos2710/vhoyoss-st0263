@@ -1,4 +1,4 @@
-
+import os
 from src.protobuf_files.filesystem_pb2 import Response
 from src.protobuf_files.filesystem_pb2_grpc import FileSystemServicer, FileSystem
 from grpc import StatusCode
@@ -10,6 +10,15 @@ class FileSystemService(FileSystemServicer):
               print("Error, empty file")
               raise Exception("Empty file")
           response = Response(message=f"File '{request.name}' uploaded succesfully (ID: {request.id})")
+          current_directory = os.path.dirname(os.path.abspath(__file__))
+          files_directory = os.path.join(current_directory, '..','..', 'files')
+          if not os.path.exists(files_directory):
+              os.makedirs(files_directory)
+          file_path = os.path.join(files_directory, request.name)
+          file = open(file_path, 'w')
+          file.close()
+
+
           print(response)
           print("eNTRAAA")
           return response

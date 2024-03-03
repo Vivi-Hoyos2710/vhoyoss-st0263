@@ -24,7 +24,7 @@ class Client_Remote:
     
     def download(self, socket, filenamestr) -> None:
         print(f"Intentando crear cliente con SOCKET={socket}", flush=True)
-        print(socket)
+        #print(socket)
         client = self._create_client(socket)
         req =  Filename(id=1,name=filenamestr)
         print(req)

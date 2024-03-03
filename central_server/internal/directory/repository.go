@@ -22,8 +22,11 @@ func NewDefaultRepo(newIndexTable *map[string][]string) DirRepository {
 }
 func (d defaultMapRepo) SaveIndex(index Index) error {
 	for _, file := range index.Files {
-		(*d.indexTable)[file] = append((*d.indexTable)[file], index.Username)
+		if !contains((*d.indexTable)[file], index.Username) {
+			(*d.indexTable)[file] = append((*d.indexTable)[file], index.Username)
+		}
 	}
+
 	return nil
 }
 
@@ -39,4 +42,12 @@ func (d defaultMapRepo) SearchFile(filename string) ([]string, error) {
 		return user, nil
 	}
 	return []string{}, ErrNotFound
+}
+func contains(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
+		}
+	}
+	return false
 }
