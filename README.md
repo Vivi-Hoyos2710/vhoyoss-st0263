@@ -61,12 +61,17 @@ No se implementó MOM (El profesor recomendo no utilizarlo)
 Se utilizaron Python y Go. el primero para la construcción de los peers y el segundo para el servidor central.
 
 ## Principales librerias utilizadas y sus versiones
-
+Python:
 - grpcio==1.62.0
 - grpcio-tools==1.62.0
 - protobuf==4.25.3
 - python-dotenv==1.0.1
-- requests==2.28.1
+- requests==2.28.1,
+Golang:
+- Go version= 1.21.4
+- gin v1.9.1
+- jwt v3.2.2
+- crypto v0.9.0
 
 ## Como se compila y ejecuta.
 
