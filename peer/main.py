@@ -73,7 +73,7 @@ if __name__ == "__main__":
     
     error, login_response = setup.logIn(client.url_servidor, LogIn_data)
     if error:
-        print(login_response['message'])
+        print(login_response)
         sys.exit()
     else:
         print("Logged in successfully!!")
@@ -112,7 +112,7 @@ if __name__ == "__main__":
             querydata = query_procedure()
             error, query_response = client.do_download(client.url_servidor, querydata, authToken)
             if error:
-                print(query_response['message'])
+                print(query_response)
             else:
                 sent_index_files = setup.do_sendIndex(client.url_servidor, [querydata['filename']], authToken)
                 print(query_response)
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             querydata = upload_procedure()
             error, query_response = client.do_upload(client.url_servidor, querydata, authToken)
             if error:
-                print(query_response['message'])
+                print(query_response)
             else: 
                 print(query_response)
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         elif action == "5":
             error, logout_response = client.logOut(client.url_servidor, authToken)
             if error:
-                print(logout_response['message'])
+                print(logout_response)
             else:
                 print(logout_response['message'])
             break
