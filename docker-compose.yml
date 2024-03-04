@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   central_server:
     build:
@@ -15,24 +14,6 @@ services:
       - ./central_server:/app
     networks:
       - reto-1
-
-  peer-1:
-    build:
-      context: ./peer
-    command: python main.py
-    env_file:
-      - ./peer/.env
-    expose:
-      - 5500
-    ports:
-      - 5500:5500
-    volumes:
-      - ./peer:/app
-    networks:
-      - reto-1
-    depends_on:
-      - central_server
-
 
 networks:
   reto-1:

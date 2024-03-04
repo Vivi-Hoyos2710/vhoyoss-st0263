@@ -10,10 +10,10 @@ class SetUp():
         try:
             login_response = requests.post(specurl, json=LogIn_data)
             login_response.raise_for_status()
-            return login_response.json()
+            return False, login_response.json()
         except requests.exceptions.RequestException as e:
             print(f"Error making request: {e}")
-            return False
+            return True, login_response.json
         
     def get_files_in_folder():
         files_array = []

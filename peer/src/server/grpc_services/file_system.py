@@ -19,8 +19,6 @@ class FileSystemService(FileSystemServicer):
           file.close()
 
 
-          print(response)
-          print("eNTRAAA")
           return response
       except Exception as e:
           context.set_details(str(e))
