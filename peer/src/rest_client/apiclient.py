@@ -47,13 +47,9 @@ class APIClient(cmd.Cmd):
     def do_download(self, url, querydata, authToken):
         error, query_response = self.do_query(url, querydata, authToken)
         if error:
-            return query_response
-        #specurl = url + "api/v1/query?file=" + querydata['filename']
-        #headers = {
-        #    "Authorization": authToken
-        #}
+            return query_response['message']
+       
         try:
-            #query_response = requests.get(specurl, headers=headers)
             client_grpc = Client_Remote()
             
             dresponse = client_grpc.download(f"{query_response['location']}", querydata['filename'])
