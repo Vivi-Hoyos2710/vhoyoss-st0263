@@ -1,17 +1,30 @@
 version: "3.8"
+
 services:
-  central_server:
+
+  pclient:
     build:
-      context: ./central_server
-    command: air
+      context: ./peer
+    command: python main.py
     env_file:
-      - central_server/.env
-    expose:
-      - 8000
-    ports:
-      - 8000:8000
+      - ./peer/.env
     volumes:
-      - ./central_server:/app
+      - ./peer:/app
+    networks:
+      - reto-1
+
+  pserver:
+    build:
+      context: ./peer
+    command: python pserver.py
+    env_file:
+      - ./peer/.env
+    expose:
+      - 9000
+    ports:
+      - 9000:9000
+    volumes:
+      - ./peer:/app
     networks:
       - reto-1
 
